@@ -1,74 +1,118 @@
 # PQC-HO
 
-Reproducibility package for **“PQC-HO: Workload-Aware Radio–Edge Scheduling for Low-Latency 6G Vehicular Handover.”**
+Official reproducibility package for:
 
-PQC-HO is a 1-ms discrete-time simulator for deadline-constrained vehicular handover. It models radio transmission followed by MEC authentication processing, while keeping each vehicle's externally assigned post-quantum security tier fixed. The scheduler uses the communication and computation workload created by that tier; it never selects or downgrades cryptography.
+> **PQC-HO: Workload-Aware Radio–Edge Scheduling for Low-Latency 6G Vehicular Handover**  
+> Poushali Sengupta and Mayank Raikwar
 
-## What is included
+PQC-HO is a 1-ms discrete-time simulator for deadline-constrained vehicular handover. It models radio transmission followed by multi-access edge computing (MEC) authentication processing. Each vehicle's post-quantum cryptography (PQC) security tier is assigned externally and remains fixed: the scheduler uses the communication and computation workload created by that tier but never selects or weakens the cryptographic protection.
 
-```text
-PQC-HO/
-├── src/pqcho/                 # Reusable simulator, schedulers, CLI, plots, statistics
-├── scripts/                   # Standalone parameter-sensitivity analysis
-├── data/                      # Reported ML-KEM/ML-DSA workload measurements
-├── notebooks/                # Clean quickstart plus archived source notebooks
-├── tests/                    # Fast deterministic unit tests
-├── docs/                     # Reproduction and result notes
-├── results/                  # Generated outputs (ignored except .gitkeep)
-├── pyproject.toml            # Installable Python package
-├── environment.yml           # Conda environment
-└── Makefile                  # Common commands
-```
+## Repository contents
 
-## Quick start
+This final GitHub export keeps the principal files at the repository root:
 
-Python 3.10 or newer is recommended.
+| File | Purpose |
+|---|---|
+| `experiments.py` | Frozen V3 simulator, schedulers, experiment suite, figures, statistical tests, and command-line interface |
+| `run_sensitivity.py` | Standalone sensitivity analysis for urgency-window width `W` and tier-reservation fraction `rho` |
+| `pqc_profiles_reported.csv` | Reported ML-KEM/ML-DSA payload sizes and measured edge-processing workloads |
+| `pqcho_quickstart.ipynb` | Compact demonstration notebook from the structured release |
+| `icc_updated_revised_original.ipynb` | Final supplied development notebook, preserved for provenance |
+| `icc_original.ipynb` | Earlier supplied notebook, preserved for provenance |
+| `REPRODUCIBILITY.md` | Detailed reproduction workflow and seed-hygiene guidance |
+| `RESULTS.md` | Expected headline results and interpretation notes |
+| `CITATION.cff` | Citation metadata |
+| `PQC-HO-v1.0.0.zip` | Complete structured, installable release with source, tests, CI, documentation, and notebooks |
+
+For normal use directly from this repository, follow the commands below. For editable package installation, automated tests, or the clean notebook workflow, extract `PQC-HO-v1.0.0.zip` and follow the README inside that structured release.
+
+## Requirements
+
+- Python 3.10 or newer
+- NumPy
+- pandas
+- Matplotlib
+- SciPy
+- Optional: `liboqs-python` for fresh cryptographic benchmarking
+
+Create an isolated environment and install the simulation dependencies:
 
 ```bash
 python -m venv .venv
-source .venv/bin/activate       # Windows: .venv\Scripts\activate
+source .venv/bin/activate          # Windows: .venv\Scripts\activate
 python -m pip install --upgrade pip
-python -m pip install -e ".[dev]"
-pytest
+python -m pip install -r requirements.txt
 ```
 
-Run a small pipeline check using explicit demo timings:
+## Quick software check
+
+Run the shortened experiment suite with explicit demo timings:
 
 ```bash
-pqcho run --demo --quick --seeds 2 --seed-start 9001 --outdir results/smoke
+python experiments.py run \
+  --demo \
+  --quick \
+  --seeds 2 \
+  --seed-start 9001 \
+  --outdir results/smoke
 ```
 
-Demo outputs are only software checks and must not be reported as paper evidence.
+Demo timings are placeholders for software validation. **Do not report demo outputs as paper evidence.**
 
 ## Reproduce the reported experiment configuration
 
-The repository includes the measured workload values reported in the manuscript:
+Run the frozen V3 evaluation using the workload measurements reported in the manuscript and final seeds 7001–7020:
 
 ```bash
-pqcho run \
-  --profiles data/pqc_profiles_reported.csv \
+python experiments.py run \
+  --profiles pqc_profiles_reported.csv \
   --seeds 20 \
   --seed-start 7001 \
   --outdir results/final_7001_7020
 ```
 
-This runs the full baseline comparison and all parameter sweeps. It can take substantially longer than the smoke test. Generated tables, figures, raw seed-level data, and run metadata are written below the selected output directory.
+This command runs the main scheduler comparison and the density, packet-loss, radio-capacity, MEC-capacity, joint-bottleneck, workload-mixture, stochastic-loss, and ablation experiments. The complete evaluation takes considerably longer than the smoke check.
 
-To benchmark ML-KEM and ML-DSA on a new machine, install `liboqs-python` and run:
+Generated outputs include:
+
+- `raw/`: seed-level and selected job-level records;
+- `tables/`: CSV summaries, manuscript tables, paired tests, and Holm-adjusted p-values;
+- `figures/`: publication-ready PDF and 300-dpi PNG figures;
+- `run_metadata.json`: profiles, configuration, platform information, seed status, and scheduler description.
+
+## Benchmark PQC workloads locally
+
+To measure ML-KEM and ML-DSA on another machine, install `liboqs-python` and run:
 
 ```bash
-pqcho benchmark --out data/pqc_profiles_local.csv --repeats 2000 --warmup 100
+python -m pip install liboqs-python
+python experiments.py benchmark \
+  --out pqc_profiles_local.csv \
+  --repeats 2000 \
+  --warmup 100
 ```
 
-Then pass the new CSV to `pqcho run`. Cryptographic timing is machine-dependent, so keep the generated CSV and `run_metadata.json` with any reported results.
+Then rerun the experiments with `--profiles pqc_profiles_local.csv`. Cryptographic timings are machine-dependent, so retain the generated CSV and record the CPU model, operating system, Python version, liboqs version, compiler/build configuration, and power mode with any reported results.
 
-## Main model defaults
+## Parameter sensitivity
+
+Run the preserved standalone sensitivity analysis with:
+
+```bash
+python run_sensitivity.py
+```
+
+It evaluates the urgency-window width `W` and tier-reservation fraction `rho` and writes results to `PQC_HO_PARAMETER_SENSITIVITY`.
+
+## Main model configuration
 
 | Setting | Default |
 |---|---:|
 | Vehicles | 300 |
+| Simulation resolution | 1 ms |
 | Arrival window | 300 ms |
 | Burst fraction/window | 75% / 60 ms |
+| PQC tier mixture | 40% P1 / 40% P2 / 20% P3 |
 | Mobility deadline | Uniform 70–140 ms |
 | Radio bandwidth | 20 MHz |
 | SNR | 12 ± 4 dB |
@@ -79,19 +123,20 @@ Then pass the new CSV to `pqcho run`. Cryptographic timing is machine-dependent,
 | Tier-reservation fraction, `rho` | 0.85 |
 | Final seed block | 7001–7020 |
 
-The model is a reproducible systems-level abstraction, not a full 3GPP NR-V2X implementation.
+The evaluation includes FIFO, Round Robin, EDF, Proportional Fair, Least Laxity, SRPT, an architecture-matched workload-unaware scheduler, and PQC-HO.
 
-## Methods and outputs
+## Expected headline result
 
-The evaluation includes FIFO, Round Robin, EDF, Proportional Fair, Least Laxity, SRPT, an architecture-matched workload-unaware scheduler, and PQC-HO. The pipeline reports latency, deadline violation, tardiness, hard-failure, per-tier reliability, fairness, scheduler runtime, paired Wilcoxon tests, and Holm-adjusted p-values.
+Under the nominal frozen configuration, PQC-HO reduces the mean deadline-violation rate from **18.90%** for the architecture-matched workload-unaware scheduler to **17.90%**. The benefit becomes larger when heterogeneous PQC workloads compete under constrained MEC capacity. See `RESULTS.md` for the complete interpretation and the distinction between the nominal result and the separate parameter-sensitivity estimate.
 
-See [docs/REPRODUCIBILITY.md](docs/REPRODUCIBILITY.md) for the complete workflow and [docs/RESULTS.md](docs/RESULTS.md) for the expected headline results.
+## Scientific scope
+
+This is a reproducible systems-level radio/MEC scheduling abstraction. It is not a packet-accurate 3GPP NR-V2X stack, a new authentication protocol, a cryptographic security proof, or production security software. The scheduler does not change the security tier assigned to any vehicle.
 
 ## Citation
 
-Use the metadata in [CITATION.cff](CITATION.cff). Add the paper DOI and final publication venue after acceptance.
+Citation metadata is provided in `CITATION.cff`. Add the final conference details and DOI after publication.
 
 ## License
 
-No reuse license is granted yet; see [LICENSE](LICENSE). Before making the repository public, the authors should deliberately choose an open-source license if reuse is intended.
-
+The current `LICENSE` grants no reuse rights. The authors should deliberately select an open-source license before public release if external reuse and modification are intended.
