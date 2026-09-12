@@ -1,0 +1,5 @@
+profile,kem,signature,kem_public_key_bytes,kem_ciphertext_bytes,sig_public_key_bytes,signature_bytes,edge_crypto_ms,protocol_overhead_bytes
+P1,ML-KEM-512,ML-DSA-44,800,768,1312,2420,0.089634,600
+P2,ML-KEM-768,ML-DSA-65,1184,1088,1952,3309,0.100652,600
+P3,ML-KEM-1024,ML-DSA-87,1568,1568,2592,4627,0.133714,600
+
