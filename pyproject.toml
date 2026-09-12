@@ -1,0 +1,46 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pqcho"
+version = "1.0.0"
+description = "Workload-aware radio-edge scheduling for post-quantum vehicular handover"
+readme = "README.md"
+requires-python = ">=3.10"
+authors = [
+  {name = "Poushali Sengupta"},
+  {name = "Mayank Raikwar"},
+]
+dependencies = [
+  "matplotlib>=3.7,<4",
+  "numpy>=1.24,<3",
+  "pandas>=2.0,<3",
+  "scipy>=1.10,<2",
+]
+
+[project.optional-dependencies]
+benchmark = ["liboqs-python>=0.12"]
+dev = [
+  "jupyterlab>=4,<5",
+  "nbclient>=0.10,<1",
+  "nbformat>=5.9,<6",
+  "pytest>=8,<9",
+  "ruff>=0.9,<1",
+]
+
+[project.scripts]
+pqcho = "pqcho.experiments:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+
+[tool.ruff]
+target-version = "py310"
+line-length = 120
+exclude = ["notebooks"]
+

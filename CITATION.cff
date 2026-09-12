@@ -1,0 +1,19 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite the associated paper."
+type: software
+title: "PQC-HO: Workload-Aware Radio-Edge Scheduling for Low-Latency 6G Vehicular Handover"
+version: 1.0.0
+date-released: 2026-09-12
+authors:
+  - family-names: Sengupta
+    given-names: Poushali
+  - family-names: Raikwar
+    given-names: Mayank
+keywords:
+  - vehicular networks
+  - handover
+  - radio-edge scheduling
+  - multi-access edge computing
+  - post-quantum cryptography
+  - 6G
+
