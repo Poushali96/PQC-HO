@@ -26,6 +26,25 @@ This final GitHub export keeps the principal files at the repository root:
 
 For normal use directly from this repository, follow the commands below. For editable package installation, automated tests, or the clean notebook workflow, extract `PQC-HO-v1.0.0.zip` and follow the README inside that structured release.
 
+## Resulted Figures
+
+ The Result figures are also provided in high-resolution PNG format here.
+
+The PNG versions were generated at **600 dpi** from the corresponding publication-quality PDF figures. The underlying plots, numerical values, labels, and visual layout were not modified; only the output format was changed.
+
+### Final PNG Figures
+
+The following files are used in the manuscript:
+
+| Figure file | Description |
+|---|---|
+| `fig_main_deadline_violation_final.png` | Main comparison of deadline-violation performance across scheduling methods |
+| `fig_ablation_violation_final.png` | Ablation study showing the effect of individual PQC-HO components |
+| `fig_density_violation_final.png` | Vehicle-density sensitivity analysis |
+| `fig_radio_mec_gain_heatmap_final.png` | Relative PQC-HO deadline-violation reduction across joint radio and MEC capacity conditions |
+
+
+
 ## Requirements
 
 - Python 3.10 or newer
